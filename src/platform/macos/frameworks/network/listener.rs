@@ -1,4 +1,5 @@
 use std::os::raw::c_char;
+use crate::ext_block;
 
 use super::NWObject;
 use super::parameters::*;
@@ -7,10 +8,10 @@ use super::super::system::dispatch::{DispatchObject, queue::dispatch_queue};
 
 // #include <Network/connection.h>
 // #include <Network/advertise_descriptor.h>
-// #include <Network/error.h>
+use super::error::*;
 
 extern {
-    /*!
+    /*
      * @typedef nw_listener_t
      * @abstract
      *		A Network Listener is an object that is able to receive incoming nw_connection_t
@@ -26,30 +27,30 @@ extern {
      */
     pub type nw_listener;
 }
-//
-// /*!
-//  * @typedef nw_listener_state_t
-//  * @abstract
-//  *		Listener states sent by nw_listener_set_state_changed_handler.
-//  *		States progress forward and do not move backwards.
-//  */
-// typedef enum {
-//     /*!
-//      *	@const nw_listener_state_invalid The state of the listener is not valid. This state
-//      *		will never be delivered in the listener's state update handler, and can be treated as
-//      *		an unexpected value.
-//      */
-//     nw_listener_state_invalid = 0,
-//     /*! @const nw_listener_state_waiting The listener is waiting for a usable network before being able to receive connections */
-//     nw_listener_state_waiting = 1,
-//     /*! @const nw_listener_state_ready The listener is ready and able to accept incoming connections */
-//     nw_listener_state_ready = 2,
-//     /*! @const nw_listener_state_failed The listener has irrecoverably closed or failed */
-//     nw_listener_state_failed = 3,
-//     /*! @const nw_listener_state_cancelled The listener has been cancelled by the caller */
-//     nw_listener_state_cancelled = 4,
-// } nw_listener_state_t;
-//
+
+/*
+ * @typedef nw_listener_state_t
+ * @abstract
+ *		Listener states sent by nw_listener_set_state_changed_handler.
+ *		States progress forward and do not move backwards.
+ */
+pub enum nw_listener_state {
+    /*
+     *	@const nw_listener_state_invalid The state of the listener is not valid. This state
+     *		will never be delivered in the listener's state update handler, and can be treated as
+     *		an unexpected value.
+     */
+    nw_listener_state_invalid = 0,
+    /* @const nw_listener_state_waiting The listener is waiting for a usable network before being able to receive connections */
+    nw_listener_state_waiting = 1,
+    /* @const nw_listener_state_ready The listener is ready and able to accept incoming connections */
+    nw_listener_state_ready = 2,
+    /* @const nw_listener_state_failed The listener has irrecoverably closed or failed */
+    nw_listener_state_failed = 3,
+    /* @const nw_listener_state_cancelled The listener has been cancelled by the caller */
+    nw_listener_state_cancelled = 4,
+}
+
 
 #[link(name = "Network", kind = "framework")]
 extern "C" {
@@ -140,30 +141,30 @@ extern "C" {
     pub fn nw_listener_set_queue(listener: NWObject<nw_listener>,
                                  queue: DispatchObject<dispatch_queue>);
 }
-// #ifdef __BLOCKS__
-//
-// typedef void (^nw_listener_state_changed_handler_t)(nw_listener_state_t state, _Nullable nw_error_t error);
-//
-// /*!
-//  * @function nw_listener_set_state_changed_handler
-//  *
-//  * @abstract
-//  *		Sets the state change handler. For clients that need to perform cleanup when the
-//  *		connection has been cancelled, the nw_listener_state_cancelled state will
-//  *		be delivered last.
-//  *
-//  * @param listener
-//  *		The listener object.
-//  *
-//  * @param handler
-//  *		The state changed handler to call when the listener state changes.
-//  *		Pass NULL to remove the event handler.
-//  */
-// API_AVAILABLE(macos(10.14), ios(12.0), watchos(5.0), tvos(12.0))
-// void
-// nw_listener_set_state_changed_handler(nw_listener_t listener,
-// _Nullable nw_listener_state_changed_handler_t handler);
-//
+
+pub type nw_listener_state_changed_handler_t<'a> = &'a ext_block!((nw_listener_state, NWObject<nw_error>), ());
+
+#[link(name = "Network", kind = "framework")]
+extern "C" {
+    /*!
+     * @function nw_listener_set_state_changed_handler
+     *
+     * @abstract
+     *    	Sets the state change handler. For clients that need to perform cleanup when the
+     *    	connection has been cancelled, the nw_listener_state_cancelled state will
+     *    	be delivered last.
+     *
+     * @param listener
+     *    	The listener object.
+     *
+     * @param handler
+     *    	The state changed handler to call when the listener state changes.
+     *    	Pass NULL to remove the event handler.
+     */
+    pub fn nw_listener_set_state_changed_handler(listener: NWObject<nw_listener>,
+                                                 handler: nw_listener_state_changed_handler_t);
+}
+
 // /*!
 //  * @typedef nw_listener_new_connection_handler_t
 //  *

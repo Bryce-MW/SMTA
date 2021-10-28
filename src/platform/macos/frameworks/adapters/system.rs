@@ -6,6 +6,7 @@ pub mod dispatch {
         use dispatch::queue::*;
 
         pub type Queue = DispatchObject<dispatch_queue>;
+        pub type Priority = dispatch::queue::Priority;
 
         // TODO(bryce): See what changes need to be done to Priority
         pub fn get_global_queue(identifier: Priority, flags: isize) -> Queue {

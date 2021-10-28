@@ -1,4 +1,6 @@
 use core::ffi::c_void;
+use core::mem;
+use super::Class;
 
 // use super::Availability::*;
 // use super::TargetConditionals::*;
@@ -27,6 +29,13 @@ extern "C" {
     // Used by the compiler. Do not use these variables yourself.
     static _NSConcreteGlobalBlock: [*mut c_void; 32];
     static _NSConcreteStackBlock: [*mut c_void; 32];
+}
+pub unsafe fn R_NSConcreteGlobalBlock() -> &'static Class {
+    mem::transmute(&_NSConcreteGlobalBlock)
+}
+
+pub unsafe fn R_NSConcreteStackBlock() -> &'static Class {
+    mem::transmute(&_NSConcreteStackBlock)
 }
 
 // // Type correct macros

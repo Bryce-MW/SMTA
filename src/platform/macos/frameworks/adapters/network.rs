@@ -5,7 +5,7 @@ pub mod parameters {
     use super::*;
     use network::parameters::*;
 
-    pub type ConfigureProtocolBlock = nw_parameters_configure_protocol_block_t;
+    pub type ConfigureProtocolBlock<'a> = nw_parameters_configure_protocol_block_t<'a>;
     pub type Parameters = NWObject<nw_parameters>;
 
     pub fn create_secure_tcp(tls_conf: ConfigureProtocolBlock,
@@ -16,7 +16,7 @@ pub mod parameters {
         }
     }
 
-    pub fn default_configuration() -> ConfigureProtocolBlock {
+    pub fn default_configuration() -> ConfigureProtocolBlock<'static> {
         unsafe {
             return _nw_parameters_configure_protocol_default_configuration;
         }
@@ -33,6 +33,8 @@ pub mod listener {
     use super::super::system::dispatch::queue::Queue;
 
     pub type Listener = NWObject<nw_listener>;
+    pub type State = nw_listener_state;
+    pub type StateChangedHandler<'a> = nw_listener_state_changed_handler_t<'a>;
 
     // IMPORTANT(bryce): We always concat "\0" so from_bytes_with_nul_unchecked is ok
     #[macro_export]
@@ -51,4 +53,17 @@ pub mod listener {
             nw_listener_set_queue(listener, queue)
         }
     }
+
+    pub fn set_state_changed_handler(listener: Listener, handler: StateChangedHandler) {
+        unsafe {
+            nw_listener_set_state_changed_handler(listener, handler)
+        }
+    }
+}
+
+pub mod error {
+    use super::*;
+    use network::error::nw_error;
+
+    pub type Error = NWObject<nw_error>;
 }

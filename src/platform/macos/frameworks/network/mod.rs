@@ -2,6 +2,7 @@ pub mod parameters;
 pub mod nw_object;
 pub mod listener;
 pub mod protocol_options;
+pub mod error;
 
 use super::object::{RetainRelease, Object};
 use nw_object::{nw_retain, nw_release};

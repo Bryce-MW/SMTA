@@ -51,12 +51,12 @@ extern {
 //
 // #ifdef __BLOCKS__
 //
-pub type nw_parameters_configure_protocol_block_t = ext_block!((NWObject<nw_protocol_options>), ());
+pub type nw_parameters_configure_protocol_block_t<'a> = &'a ext_block!((NWObject<nw_protocol_options>), ());
 
 #[link(name = "Network", kind = "framework")]
 extern "C" {
-    pub static _nw_parameters_configure_protocol_default_configuration: nw_parameters_configure_protocol_block_t;
-    pub static _nw_parameters_configure_protocol_disable: nw_parameters_configure_protocol_block_t;
+    pub static _nw_parameters_configure_protocol_default_configuration: nw_parameters_configure_protocol_block_t<'static>;
+    pub static _nw_parameters_configure_protocol_disable: nw_parameters_configure_protocol_block_t<'static>;
 
     /*
      * @function nw_parameters_create_secure_tcp

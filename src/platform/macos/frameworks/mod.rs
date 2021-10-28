@@ -1,7 +1,7 @@
 pub mod adapters;
 pub mod blocks;
-pub mod network;
-pub mod system;
+mod network;
+mod system;
 
 pub mod object {
     use core::ffi::c_void;
@@ -19,6 +19,17 @@ pub mod object {
                 None => {}
                 Some(obj) => unsafe {
                     D::release(obj.cast());
+                }
+            }
+        }
+    }
+    impl<T: ?Sized, D: RetainRelease> Clone for Object<T, D> {
+        fn clone(&self) -> Self {
+            match self.0 {
+                None => Object(None, PhantomData),
+                Some(ptr) => unsafe {
+                    D::retain(ptr.cast());
+                    Object(Some(ptr), PhantomData)
                 }
             }
         }
